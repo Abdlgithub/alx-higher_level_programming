@@ -1,122 +1,62 @@
 #!/usr/bin/python3
+"""
+nqueens backtracking program to print the coordinates of n queens
+on an nxn grid such that they are all in non-attacking positions
+"""
 
 
-class Chess():
-    __size = 0
-    __matrix = []
-
-    def __init__(self, prmSize=0):
-        self.size = prmSize
-        self.__matrix = self.__initMatrix(self.size)
-
-    @property
-    def size(self):
-        return self.__size
-
-    @size.setter
-    def size(self, prmValue):
-        if isinstance(prmValue, str) and prmValue.isnumeric():
-            prmValue = int(prmValue)
-        if not isinstance(prmValue, int):
-            raise TypeError("N must be a number")
-        if prmValue < 4:
-            raise ValueError("N must be least 4")
-
-        self.__size = prmValue
-
-    def __generateNQueenSolution(self, prmMatrix, prmX, prmY=0):
-        if prmX >= self.size:
-            return True
-
-        limit = self.size if prmY == 0 else prmY - self.size
-
-        print("{}: {}".format(prmY, limit))
-        for y in range(prmY, limit):
-            if self.__isQueenSafe(prmMatrix, prmX, y):
-                prmMatrix[y][prmX] = 1
-
-                if self.__generateNQueenSolution(prmMatrix, prmX + 1) is True:
-                    return True
-
-                prmMatrix[y][prmX] = 0
-        return False
-
-    def __initMatrix(self, prmNumber=0):
-        return [
-            [0 for x in range(prmNumber)] for y in range(prmNumber)
-        ]
-
-    def __solveNQueen(self, prmMatrix=[], prmX=0, prmY=0):
-        matrix = prmMatrix if len(prmMatrix) > 0 else self.__matrix.copy()
-        result = []
-
-        self.__generateNQueenSolution(matrix, prmX, prmY)
-
-        for y in range(len(matrix)):
-            for x in range(len(matrix)):
-                if matrix[y][x] != 0:
-                    result.append([x, y])
-
-        return result
-
-    def __isQueenSafe(self, prmMatrix, prmX, prmY):
-        if not isinstance(prmX, int):
-            raise TypeError("X must be a number")
-        if not isinstance(prmY, int):
-            raise TypeError("Y must be a number")
-
-        return (self.__checkDiagonal(prmMatrix, prmX, prmY) and
-                self.__checkRow(prmMatrix, prmX) and
-                self.__checkColumn(prmMatrix, prmY))
-
-    def __checkRow(self, prmMatrix, prmX):
-        for y in range(self.size):
-            if prmMatrix[y][prmX] == 1:
-                return False
-        return True
-
-    def __checkColumn(self, prmMatrix, prmY):
-        for x in range(self.size):
-            if prmMatrix[prmY][x] == 1:
-                return False
-        return True
-
-    def __checkDiagonal(self, prmMatrix, prmX, prmY):
-        for row, column in zip(range(prmY, -1, -1), range(prmX, -1, -1)):
-            if prmMatrix[row][column] == 1:
-                return False
-        for row, column in zip(range(prmY, self.size, 1), range(prmX, -1, -1)):
-            if prmMatrix[row][column] == 1:
-                return False
-        return True
-
-    def printSolvedMatrix(self):
-        x = 0
-        y = 0
-        matrix = []
-        for i in range(self.size):
-            result = self.__solveNQueen(matrix, x, y)
-            self.__printEnableCoordinatesMatrix(result)
-            x, y = list(result[i])
-            matrix = self.__initMatrix(self.size)
-            # matrix[x][y] = 1
-            # self.__printEnableCoordinatesMatrix(result)
-
-    def __printEnableCoordinatesMatrix(self, prmMatrix=[]):
-        for coordinate in prmMatrix:
-            x, y = coordinate
-            print("[{:d}, {:d}]".format(x, y), end='')
-
-        print()
-
+from sys import argv
 
 if __name__ == "__main__":
-    import sys
-
-    size = len(sys.argv)
-    if (size - 1 != 1):
+    a = []
+    if len(argv) != 2:
         print("Usage: nqueens N")
-        sys.exit(1)
+        exit(1)
+    if argv[1].isdigit() is False:
+        print("N must be a number")
+        exit(1)
+    n = int(argv[1])
+    if n < 4:
+        print("N must be at least 4")
+        exit(1)
 
-    chess = Chess(sys.argv[1])
-    chess.printSolvedMatrix()
+    # initialize the answer list
+    for i in range(n):
+        a.append([i, None])
+
+    def already_exists(y):
+        """check that a queen does not already exist in that y value"""
+        for x in range(n):
+            if y == a[x][1]:
+                return True
+        return False
+
+    def reject(x, y):
+        """determines whether or not to reject the solution"""
+        if (already_exists(y)):
+            return False
+        i = 0
+        while(i < x):
+            if abs(a[i][1] - y) == abs(i - x):
+                return False
+            i += 1
+        return True
+
+    def clear_a(x):
+        """clears the answers from the point of failure on"""
+        for i in range(x, n):
+            a[i][1] = None
+
+    def nqueens(x):
+        """recursive backtracking function to find the solution"""
+        for y in range(n):
+            clear_a(x)
+            if reject(x, y):
+                a[x][1] = y
+                if (x == n - 1):  # accepts the solution
+                    print(a)
+                else:
+                    nqueens(x + 1)  # moves on to next x value to continue
+
+    # start the recursive process at x = 0
+    nqueens(0)
