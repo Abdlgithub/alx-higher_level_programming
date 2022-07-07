@@ -1,20 +1,20 @@
 #!/usr/bin/python3
-""" add_integer module """
+# -*- coding: utf-8 -*-
+"""[This module contains a function that adds two integers]
+    Arguments: a {[type]} -- first value
+    Keyword Arguments: b {int} -- second value (default: {98})
+"""
 
 
-def add_integer(prmA, prmB=98):
-    """ add_integer function
-    this function add two integer
-    Attributes:
-        prmA: first integer
-        prmB: optional second integer (init by 98 by default)
+def add_integer(a, b=98):
+    """This function add a + b
+        Returns: int -- add (a + b)
     """
-    if isinstance(prmA, float):
-        prmA = int(prmA)
-    if isinstance(prmB, float):
-        prmB = int(prmB)
-    if not isinstance(prmA, int):
-        raise TypeError("a must be an integer")
-    if not isinstance(prmB, int):
-        raise TypeError("b must be an integer")
-    return prmA + prmB
+    e_a = "a must be an integer"
+    e_b = "b must be an integer"
+
+    if type(a) != int and type(a) != float:
+        raise TypeError(e_a)
+    if type(b) != int and type(b) != float:
+        raise TypeError(e_b)
+    return int(a) + int(b)
